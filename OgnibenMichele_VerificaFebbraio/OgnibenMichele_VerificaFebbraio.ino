@@ -3,37 +3,37 @@ int ledRosso;
 int ledGiallo;
 int ledBianco;
 int ledVerde;
-                            //DICHIARAZIONE DURATA ACCENSIONE LED
+                            //DICHIARAZIONE DURATA ACCENSIONE LED E CICLI
 int durataR;
 int durataG;
 int durataB;
 int durataV;
+int cicli;
+int richiesta;
 
 void setup() {
-                            //ASSEGNAZIONE LED
+                            //ASSEGNAZIONE LED E RICHIESTA
   ledRosso  = 13;
   ledGiallo = 11;
   ledBianco = 7;
   ledVerde  = 5;
+  richiesta = 0;
                             //PINMODE
   pinMode(ledRosso, OUTPUT);
   pinMode(ledGiallo, OUTPUT);
   pinMode(ledBianco, OUTPUT);
   pinMode(ledVerde, OUTPUT);
-                            //SERIALE
+                            //SERIALE ED INPUT DEI CICLI
   Serial.begin(9600);
-  durataR = inputSeriale("Quanti secondi deve durare il led rosso?", durataR);
-  durataG = inputSeriale("Quanti secondi deve durare il led giallo?", durataG);
-  durataB = inputSeriale("Quanti secondi deve durare il led bianco?", durataB);
-  durataV = inputSeriale("Quanti secondi deve durare il led verde?", durataV);
+  Serial.println("Dopo quanti cicli si deve resettare il tempo?");
+  while(Serial.available() == 0) {};
+  cicli = Serial.readString().toInt();
+  Serial.println(cicli);
 }
 
 int inputSeriale(String frase, int var){
-  Serial.println(frase);
-  while (Serial.available() == 0) {};
-  String var1 = Serial.readString();
-  Serial.println(var1);
-  var = var1.toInt() * 1000;
+  var = random(1,5) * 1000;
+  Serial.println(frase + (var / 1000));
   return var;
 }
 
@@ -44,6 +44,16 @@ void accendiLed(int led_on, int led_off, int ritardo){
 }
 
 void loop() {
+  if (cicli == richiesta)                 //VALORI RANDOM DI DURATE
+  {
+    Serial.println("Nuove durate:");
+    durataR = inputSeriale("Secondi durata rosso: ", durataR);
+    durataG = inputSeriale("Secondi durata giallo: ", durataG);
+    durataB = inputSeriale("Secondi durata bianco: ", durataB);
+    durataV = inputSeriale("Secondi durata verde: ", durataV);
+    richiesta = 0;
+  }
+  richiesta++;
   accendiLed(ledRosso, ledVerde, durataR);
   accendiLed(ledGiallo, ledRosso, durataG);
   accendiLed(ledBianco, ledGiallo, durataB);
